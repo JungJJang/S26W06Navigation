@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -61,6 +62,7 @@ fun MainScreen() {
 
             entryDecorators = listOf(
                 rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator(),
             ),
             entryProvider = entryProvider {
                 entry<PokemonRoute.PokemonList> {
@@ -101,11 +103,9 @@ fun PokemonListScreen(
 @Composable
 fun PokemonDetailScreen(
     pokemonId: Int,
-    viewModel: PokemonDetailViewModel = viewModel(),
+    viewModel: PokemonDetailViewModel = viewModel {
+        PokemonDetailViewModel(pokemonId)},
 ) {
-    val pokemon = viewModel.getPokemonById(pokemonId)
-
-    pokemon?.let {
-        Text(it.info)
-    }
+    val pokemon by viewModel.pokemon.collectAsStateWithLifecycle()
+    Text(pokemon.name)
 }
