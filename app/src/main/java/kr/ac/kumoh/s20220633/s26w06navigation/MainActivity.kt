@@ -68,24 +68,44 @@ fun MainScreen() {
             ),
             entryProvider = entryProvider {
                 entry<PokemonRoute.PokemonList> {
-                    LazyColumn {
-                        items(pokemons) { pokemon ->
-                            Button(
-                                onClick = {
-                                    backStack.add(PokemonRoute.PokemonDetail(pokemonId = pokemon.id))
-                                }
-                            ) {
-                                Text(pokemon.name)
-                            }
+                    PokemonListScreen(
+                        pokemonList = pokemons,
+                        onNavigateToDetail = { id ->
+                            backStack.add(PokemonRoute.PokemonDetail(pokemonId = id))
                         }
-                    }
+                    )
                 }
                 entry<PokemonRoute.PokemonDetail> { key ->
-                    pokemons.find {it.id == key.pokemonId}?.let {
-                        Text(it.info)
-                    }
+                    PokemonDetailScreen(key.pokemonId)
                 }
             }
         )
+    }
+}
+
+@Composable
+fun PokemonListScreen(
+    pokemonList: List<Pokemon>,
+    onNavigateToDetail: (Int) -> Unit,
+) {
+    LazyColumn {
+        items(pokemons) { pokemon ->
+            Button(
+                onClick = {
+                    onNavigateToDetail(pokemon.id)
+                }
+            ) {
+                Text(pokemon.name)
+            }
+        }
+    }
+}
+
+@Composable
+fun PokemonDetailScreen(
+    pokemonId: Int
+) {
+    pokemons.find {it.id == pokemonId}?.let {
+        Text(it.info)
     }
 }
