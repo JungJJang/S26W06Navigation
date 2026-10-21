@@ -5,4 +5,5 @@ data class Pokemon(
     val name: String,
     val type: String,
     val info: String,
+    val image: String,
 )
