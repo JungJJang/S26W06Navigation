@@ -26,6 +26,8 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
 import kr.ac.kumoh.s20220633.s26w06navigation.model.Pokemon
+import kr.ac.kumoh.s20220633.s26w06navigation.repository.MockPokemonRepository
+import kr.ac.kumoh.s20220633.s26w06navigation.repository.PokemonRepository
 import kr.ac.kumoh.s20220633.s26w06navigation.ui.theme.S26W06NavigationTheme
 import kr.ac.kumoh.s20220633.s26w06navigation.viewmodel.PokemonDetailViewModel
 import kr.ac.kumoh.s20220633.s26w06navigation.viewmodel.PokemonListViewModel
@@ -43,16 +45,19 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val repository: PokemonRepository = MockPokemonRepository()
         setContent {
             S26W06NavigationTheme {
-                MainScreen()
+                MainScreen(repository)
             }
         }
     }
 }
 
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    repository: PokemonRepository
+) {
     val backStack = rememberNavBackStack(PokemonRoute.PokemonList)
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -67,13 +72,17 @@ fun MainScreen() {
             entryProvider = entryProvider {
                 entry<PokemonRoute.PokemonList> {
                     PokemonListScreen(
+                        repository = repository,
                         onNavigateToDetail = { id ->
                             backStack.add(PokemonRoute.PokemonDetail(pokemonId = id))
                         }
                     )
                 }
                 entry<PokemonRoute.PokemonDetail> { key ->
-                    PokemonDetailScreen(key.pokemonId)
+                    PokemonDetailScreen(
+                        pokemonId = key.pokemonId,
+                        repository = repository,
+                    )
                 }
             }
         )
@@ -82,8 +91,11 @@ fun MainScreen() {
 
 @Composable
 fun PokemonListScreen(
+    repository: PokemonRepository,
     onNavigateToDetail: (Int) -> Unit,
-    viewModel: PokemonListViewModel = viewModel()
+    viewModel: PokemonListViewModel = viewModel{
+        PokemonListViewModel(repository)
+    },
 ) {
     val pokemonList by viewModel.pokemonList.collectAsStateWithLifecycle()
 
@@ -103,8 +115,13 @@ fun PokemonListScreen(
 @Composable
 fun PokemonDetailScreen(
     pokemonId: Int,
+    repository: PokemonRepository,
     viewModel: PokemonDetailViewModel = viewModel {
-        PokemonDetailViewModel(pokemonId)},
+        PokemonDetailViewModel(
+            repository = repository,
+            pokemonId = pokemonId
+        )
+    },
 ) {
     val pokemon by viewModel.pokemon.collectAsStateWithLifecycle()
     Text(pokemon.name)
