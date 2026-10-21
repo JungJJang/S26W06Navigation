@@ -27,6 +27,7 @@ import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
 import kr.ac.kumoh.s20220633.s26w06navigation.model.Pokemon
 import kr.ac.kumoh.s20220633.s26w06navigation.navigation.PokemonRoute
+import kr.ac.kumoh.s20220633.s26w06navigation.repository.ApiPokemonRepository
 import kr.ac.kumoh.s20220633.s26w06navigation.repository.MockPokemonRepository
 import kr.ac.kumoh.s20220633.s26w06navigation.repository.PokemonRepository
 import kr.ac.kumoh.s20220633.s26w06navigation.ui.screen.PokemonDetailScreen
@@ -40,7 +41,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val repository: PokemonRepository = MockPokemonRepository()
+        val repository = ApiPokemonRepository()
         setContent {
             S26W06NavigationTheme {
                 MainScreen(repository)
