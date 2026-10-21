@@ -26,20 +26,15 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
 import kr.ac.kumoh.s20220633.s26w06navigation.model.Pokemon
+import kr.ac.kumoh.s20220633.s26w06navigation.navigation.PokemonRoute
 import kr.ac.kumoh.s20220633.s26w06navigation.repository.MockPokemonRepository
 import kr.ac.kumoh.s20220633.s26w06navigation.repository.PokemonRepository
+import kr.ac.kumoh.s20220633.s26w06navigation.ui.screen.PokemonDetailScreen
+import kr.ac.kumoh.s20220633.s26w06navigation.ui.screen.PokemonListScreen
 import kr.ac.kumoh.s20220633.s26w06navigation.ui.theme.S26W06NavigationTheme
 import kr.ac.kumoh.s20220633.s26w06navigation.viewmodel.PokemonDetailViewModel
 import kr.ac.kumoh.s20220633.s26w06navigation.viewmodel.PokemonListViewModel
 import java.util.Map.entry
-
-sealed interface PokemonRoute : NavKey {
-    @Serializable
-    data object PokemonList : PokemonRoute
-
-    @Serializable
-    data class PokemonDetail(val pokemonId: Int) : PokemonRoute
-}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,42 +82,4 @@ fun MainScreen(
             }
         )
     }
-}
-
-@Composable
-fun PokemonListScreen(
-    repository: PokemonRepository,
-    onNavigateToDetail: (Int) -> Unit,
-    viewModel: PokemonListViewModel = viewModel{
-        PokemonListViewModel(repository)
-    },
-) {
-    val pokemonList by viewModel.pokemonList.collectAsStateWithLifecycle()
-
-    LazyColumn {
-        items(pokemonList) { pokemon ->
-            Button(
-                onClick = {
-                    onNavigateToDetail(pokemon.id)
-                }
-            ) {
-                Text(pokemon.name)
-            }
-        }
-    }
-}
-
-@Composable
-fun PokemonDetailScreen(
-    pokemonId: Int,
-    repository: PokemonRepository,
-    viewModel: PokemonDetailViewModel = viewModel {
-        PokemonDetailViewModel(
-            repository = repository,
-            pokemonId = pokemonId
-        )
-    },
-) {
-    val pokemon by viewModel.pokemon.collectAsStateWithLifecycle()
-    Text(pokemon.name)
 }
